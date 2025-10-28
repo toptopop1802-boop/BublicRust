@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Dashboard - Аналитика</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div id="loader" class="loader">
+        <div class="loader-spinner"></div>
+        <p>Загрузка данных...</p>
+    </div>
+
+    <div id="app" class="app" style="display: none;">
+        <aside id="sidebar" class="sidebar">
+            <div class="logo">
+                <svg class="logo-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M3 17h3V7H3v10zm5 0h3V3H8v14zm5 0h3V10h-3v7zm5 0h3V5h-3v12z"/>
+                </svg>
+                <div class="logo-text">
+                    <h1>DS Bot</h1>
+                    <p>Dashboard</p>
+                </div>
+            </div>
+            <nav>
+                <a href="#" class="nav-link active" data-page="analytics">
+                    <svg class="nav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 20h16M6 16V8m6 8V4m6 16v-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="nav-text">Аналитика</span>
+                </a>
+                <a href="#" class="nav-link" data-page="messages">
+                    <svg class="nav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8z" stroke-width="2" stroke-linejoin="round"/></svg>
+                    <span class="nav-text">Сообщения</span>
+                </a>
+                <a href="#" class="nav-link" data-page="channels">
+                    <svg class="nav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18M6 6v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6M10 10v6m4-6v6" stroke-width="2" stroke-linecap="round"/></svg>
+                    <span class="nav-text">Автоудаление</span>
+                </a>
+                <a href="#" class="nav-link" data-page="pipette">
+                    <svg class="nav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 7l3-3 3 3-3 3M4 17l6-6m0 0l4-4 3 3-4 4m-3-3l-6 6v3h3l6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="nav-text">Пипетка</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p class="footer-label">Последнее обновление</p>
+                <p id="last-update" class="time">--:--:--</p>
+            </div>
+        </aside>
+
+        <main class="content">
+            <!-- Analytics Page -->
+            <div id="page-analytics" class="page active">
+                <header class="page-header">
+                    <h2>📊 Аналитика сервера</h2>
+                    <div class="header-controls">
+                        <button id="demo-btn" class="btn btn-demo">✨ Демо</button>
+                        <select id="period-select" class="period-select">
+                            <option value="1" selected>Сегодня</option>
+                            <option value="7">7 дней</option>
+                            <option value="30">30 дней</option>
+                            <option value="90">90 дней</option>
+                        </select>
+                        <button id="refresh-btn" class="btn btn-primary">🔄 Обновить</button>
+                    </div>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Вайпы</p>
+                            <p class="stat-value" id="stat-wipes">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM7 9h10v2H7V9zm6 5H7v-2h6v2zm4-6H7V6h10v2z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Тикеты</p>
+                            <p class="stat-value" id="stat-tickets">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Роли</p>
+                            <p class="stat-value" id="stat-roles">-</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Удалено каналов</p>
+                            <p class="stat-value" id="stat-deleted">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>График активности</h3>
+                    <div class="chart-tabs">
+                        <button class="chart-tab active" data-chart="all">Все события</button>
+                        <button class="chart-tab" data-chart="wipes">Вайпы</button>
+                        <button class="chart-tab" data-chart="tickets">Тикеты</button>
+                        <button class="chart-tab" data-chart="roles">Роли</button>
+                        <button class="chart-tab" data-chart="deleted">Удаленные каналы</button>
+                        <button class="chart-tab" data-chart="members">Участники</button>
+                    </div>
+                    <canvas id="activity-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Messages Page -->
+            <div id="page-messages" class="page">
+                <header class="page-header">
+                    <h2>💬 Отправить сообщение от имени бота</h2>
+                </header>
+
+                <div class="dev-notice">
+                    <svg class="dev-spinner" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="25" cy="25" r="20" stroke="#3b9bf9" stroke-width="4" fill="none" stroke-linecap="round"/>
+                        <circle cx="25" cy="25" r="20" stroke="#6ac1ff" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="75"/>
+                    </svg>
+                    <div>
+                        <h3>Раздел в разработке</h3>
+                        <p>Отправка и чтение сообщений появится в ближайшем обновлении.</p>
+                    </div>
+                </div>
+
+                <div class="message-form" style="display:none;">
+                    <div class="form-group">
+                        <label for="guild-select">Сервер:</label>
+                        <select id="guild-select" class="form-control">
+                            <option value="">Выберите сервер...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="channel-select">Канал:</label>
+                        <select id="channel-select" class="form-control" disabled>
+                            <option value="">Сначала выберите сервер...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message-content">Сообщение:</label>
+                        <textarea id="message-content" class="form-control" rows="5" placeholder="Введите текст сообщения..."></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="send-message-btn" class="btn btn-primary" disabled>
+                            📤 Отправить
+                        </button>
+                        <button id="read-messages-btn" class="btn read-messages-btn" disabled>
+                            📖 Читать сообщения
+                        </button>
+                    </div>
+                </div>
+
+                <div id="message-status" class="message-status"></div>
+
+                <div id="messages-container" class="messages-container" style="display: none;">
+                    <h3>Сообщения в канале</h3>
+                    <div id="messages-list"></div>
+                </div>
+            </div>
+
+            <!-- Auto-delete Channels Page -->
+            <div id="page-channels" class="page">
+                <header class="page-header">
+                    <h2>🗑️ Каналы на автоудаление</h2>
+                </header>
+
+                <div id="channels-list" class="channels-list">
+                    <!-- Динамически заполняется -->
+                </div>
+            </div>
+
+            <!-- Pipette Page -->
+            <div id="page-pipette" class="page">
+                <header class="page-header">
+                    <h2>
+                        <svg class="h2-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:28px;height:28px;vertical-align:-6px;margin-right:8px;"><path d="M14 7l3-3 3 3-3 3M4 17l6-6m0 0l4-4 3 3-4 4m-3-3l-6 6v3h3l6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                        Пипетка онлайн
+                    </h2>
+                </header>
+
+                <div class="pipette-layout">
+                    <div class="pipette-left">
+                        <label class="pipette-upload" for="pipette-file">
+                            <input id="pipette-file" type="file" accept="image/*" hidden>
+                            <div class="pipette-drop" id="pipette-drop">
+                                <p>Выберите файл или перетащите изображение сюда</p>
+                                <button class="btn btn-primary" type="button">ВЫБРАТЬ ФАЙЛ</button>
+                            </div>
+                        </label>
+                        <div class="pipette-canvas-wrap" id="pipette-canvas-wrap" style="display:none;">
+                            <canvas id="pipette-canvas"></canvas>
+                            <canvas id="pipette-magnifier"></canvas>
+                            <div class="pipette-preview" id="pipette-preview"></div>
+                        </div>
+                    </div>
+                    <div class="pipette-right">
+                        <h3>Результат:</h3>
+                        <div class="pipette-result-color" id="pipette-result-color"></div>
+                        <div class="pipette-results">
+                            <div class="pipette-row"><span>HEX</span><div class="pipette-value"><input id="pipette-hex" readonly value="#3b9bf9"><button class="copy-btn" data-copy="pipette-hex">⧉</button></div></div>
+                            <div class="pipette-row"><span>RGB</span><div class="pipette-value"><input id="pipette-rgb" readonly value="-"><button class="copy-btn" data-copy="pipette-rgb">⧉</button></div></div>
+                            <div class="pipette-row"><span>CMYK</span><div class="pipette-value"><input id="pipette-cmyk" readonly value="-"><button class="copy-btn" data-copy="pipette-cmyk">⧉</button></div></div>
+                            <div class="pipette-row"><span>HSV</span><div class="pipette-value"><input id="pipette-hsv" readonly value="-"><button class="copy-btn" data-copy="pipette-hsv">⧉</button></div></div>
+                            <div class="pipette-row"><span>HSL</span><div class="pipette-value"><input id="pipette-hsl" readonly value="-"><button class="copy-btn" data-copy="pipette-hsl">⧉</button></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pipette-help">
+                <h3>Как пользоваться</h3>
+                <ul>
+                    <li>Загрузите изображение кнопкой или перетащите файл. Можно вставить по <code>Ctrl</code>+<code>V</code>.</li>
+                    <li>Ведите курсором по изображению — справа отображаются HEX, RGB, CMYK, HSV, HSL.</li>
+                    <li>ЛКМ — зафиксировать текущий цвет (повторное нажатие снимает фиксацию). Также работает клавиша <code>Space</code>.</li>
+                    <li>Клавиша <code>C</code> — копировать текущий HEX.</li>
+                    <li>Окно‑лупа показывает область 10× вокруг курсора для точного выбора пикселя.</li>
+                </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Demo Modal -->
+    <div id="demo-modal" class="modal">
+        <div class="modal-content demo-modal-content">
+            <div class="modal-header">
+                <h3>✨ Демо-режим Dashboard</h3>
+                <button class="modal-close" id="demo-modal-close">&times;</button>
+            </div>
+
+            <div class="demo-chart-wrapper">
+                <div class="demo-topbar">
+                    <div class="demo-title">
+                        <span class="demo-dot"></span>
+                        <span>График активности</span>
+                    </div>
+                    <div class="demo-range-tabs" id="demo-range-tabs">
+                        <button class="demo-range active" data-days="1">1D</button>
+                        <button class="demo-range" data-days="7">7D</button>
+                        <button class="demo-range" data-days="30">30D</button>
+                        <button class="demo-range" data-days="90">90D</button>
+                    </div>
+                </div>
+
+                <div class="demo-type-tabs" id="demo-type-tabs">
+                    <button class="demo-type active" data-type="all">Все события</button>
+                    <button class="demo-type" data-type="wipes">Вайпы</button>
+                    <button class="demo-type" data-type="tickets">Тикеты</button>
+                    <button class="demo-type" data-type="roles">Роли</button>
+                    <button class="demo-type" data-type="deleted">Удаленные каналы</button>
+                </div>
+
+                <div class="demo-chart-canvas">
+                    <canvas id="demo-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <div id="toast" class="toast"></div>
+</body>
+</html>
+
