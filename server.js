@@ -12,11 +12,15 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
 
-// Supabase Client
-const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_KEY
-);
+// Supabase Client (guard missing env)
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+let supabase = null;
+if (SUPABASE_URL && SUPABASE_KEY) {
+    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+} else {
+    console.warn('⚠️  SUPABASE_URL or SUPABASE_KEY is not set. Supabase-dependent endpoints will return 503.');
+}
 
 // Discord Client (для отправки сообщений)
 const discordClient = new Client({
@@ -45,6 +49,9 @@ discordClient.login(process.env.DISCORD_BOT_TOKEN).catch(err => {
 // Получить статистику за период
 app.get('/api/stats', async (req, res) => {
     try {
+        if (!supabase) {
+            return res.status(503).json({ error: 'Supabase not configured' });
+        }
         const days = parseInt(req.query.days) || 30;
         const cutoffDate = new Date();
         cutoffDate.setDate(cutoffDate.getDate() - days);
@@ -110,6 +117,9 @@ app.get('/api/stats', async (req, res) => {
 // Получить активные каналы для автоудаления
 app.get('/api/auto-delete-channels', async (req, res) => {
     try {
+        if (!supabase) {
+            return res.status(503).json({ error: 'Supabase not configured' });
+        }
         const { data, error } = await supabase
             .from('auto_delete_channels')
             .select('*')
