@@ -570,6 +570,7 @@ function createApp() {
             status: 'ok',
             discord: !IS_SERVERLESS && discordReady,
             supabase: !!supabase,
+            changelog: true,
             timestamp: new Date().toISOString()
         });
     });
