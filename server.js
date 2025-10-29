@@ -537,6 +537,7 @@ function createApp() {
     // Get all changelog entries
     app.get('/api/changelog', (req, res) => {
         try {
+            console.log('Changelog endpoint called');
             // Return array with 120 entries (3 rows × 40 columns)
             // Fill missing entries with null
             const result = Array(120).fill(null).map((_, index) => {
