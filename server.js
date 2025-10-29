@@ -366,7 +366,7 @@ function createApp() {
                 return {
                     id: mapId,
                     original_name: metadata.originalName || file.name,
-                    storage_path: `maps/${file.name}`,
+                    storage_path: file.name,
                     file_size: parseInt(metadata.fileSize || file.metadata?.size || '0'),
                     uploaded_at: metadata.uploadedAt || file.created_at || new Date().toISOString()
                 };
@@ -404,7 +404,7 @@ function createApp() {
                 return res.status(404).json({ error: 'Карта не найдена' });
             }
 
-            const storagePath = `maps/${file.name}`;
+            const storagePath = file.name;
 
             // Get file from Supabase Storage
             const { data: fileData, error: downloadError } = await supabase.storage
@@ -458,7 +458,7 @@ function createApp() {
                 return res.status(404).json({ error: 'Карта не найдена' });
             }
 
-            const storagePath = `maps/${file.name}`;
+            const storagePath = file.name;
 
             // Delete file from storage
             const { error: storageError } = await supabase.storage
