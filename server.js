@@ -349,7 +349,7 @@ function createApp() {
             // List all files from Storage bucket
             const { data: files, error } = await supabase.storage
                 .from('maps')
-                .list('maps', {
+                .list('', {
                     limit: 100,
                     offset: 0,
                     sortBy: { column: 'created_at', order: 'desc' }
@@ -389,7 +389,7 @@ function createApp() {
             // List files to find the one with matching ID
             const { data: files, error: listError } = await supabase.storage
                 .from('maps')
-                .list('maps');
+                .list('');
 
             if (listError) throw listError;
 
@@ -443,7 +443,7 @@ function createApp() {
             // List files to find the one with matching ID
             const { data: files, error: listError } = await supabase.storage
                 .from('maps')
-                .list('maps');
+                .list('');
 
             if (listError) throw listError;
 
