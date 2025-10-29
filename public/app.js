@@ -16,6 +16,13 @@ let demoChart = null;
 let demoCurrentDays = 30;
 let demoCurrentType = 'all';
 
+// Utility: Escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // Utility: Format time
 function formatTime(seconds) {
     const hours = Math.floor(seconds / 3600);
