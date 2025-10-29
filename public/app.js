@@ -1,5 +1,10 @@
-// API Base URL
-const API_URL = window.location.origin;
+// API Base URL (can be overridden via window.API_URL or ?api=...)
+const API_URL = (function() {
+    const qp = new URLSearchParams(window.location.search).get('api');
+    if (typeof window.API_URL === 'string' && window.API_URL.trim()) return window.API_URL.trim();
+    if (qp && qp.trim()) return qp.trim();
+    return window.location.origin;
+})();
 
 // Global State
 let chart = null;
