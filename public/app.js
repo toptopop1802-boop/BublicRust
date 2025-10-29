@@ -62,6 +62,11 @@ function hexToRgba(hex, alpha = 1) {
 async function loadAnalytics(days = 30) {
     try {
         const response = await fetch(`${API_URL}/api/stats?days=${days}`);
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const text = await response.text();
+            throw new Error(`Invalid response (status ${response.status}): ${text.slice(0, 120)}`);
+        }
         const data = await response.json();
 
         // Update stats cards
@@ -119,6 +124,41 @@ async function loadAnalytics(days = 30) {
         updateLastUpdateTime();
     } catch (error) {
         console.error('Error loading analytics:', error);
+        // Fallback: render empty timeline for requested range so UI stays usable
+        const timelineNormalized = [];
+        if (days === 1) {
+            const now = new Date();
+            const startOfDay = new Date();
+            startOfDay.setHours(0, 0, 0, 0);
+            const minutes = Math.max(1, Math.floor((now - startOfDay) / 60000));
+            for (let i = 0; i <= minutes; i++) {
+                const dt = new Date(startOfDay.getTime() + i * 60000);
+                timelineNormalized.push({
+                    date: dt.toISOString(),
+                    wipe_created: 0,
+                    ticket_created: 0,
+                    tournament_role_created: 0,
+                    channel_deleted: 0
+                });
+            }
+        } else {
+            const today = new Date();
+            const start = new Date();
+            start.setDate(today.getDate() - (days - 1));
+            for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+                const key = d.toISOString().split('T')[0];
+                timelineNormalized.push({
+                    date: key,
+                    wipe_created: 0,
+                    ticket_created: 0,
+                    tournament_role_created: 0,
+                    channel_deleted: 0
+                });
+            }
+        }
+        currentChartData = timelineNormalized;
+        updateChart(currentChartData, currentChartView);
+        updateLastUpdateTime();
     }
 }
 
