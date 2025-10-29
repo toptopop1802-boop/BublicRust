@@ -770,8 +770,16 @@ function renderDemoChart(days, type) {
             borderColor: getAccentRgba(1),
             backgroundColor: buildGradient(ctx, getAccentRgba(1)),
             fill: true,
-            tension: 0.35,
-            borderWidth: 2
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: getAccentRgba(1),
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 3,
+            pointHoverBackgroundColor: getAccentRgba(1),
+            spanGaps: true
         }];
     }
 
