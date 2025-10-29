@@ -34,10 +34,16 @@
    ### Вариант 1: Через GitHub
    - Подключите репозиторий к Vercel
    - Vercel автоматически определит настройки
-   - Добавьте переменные окружения:
-     - `SUPABASE_URL` - ваш Supabase URL
-     - `SUPABASE_KEY` - Service Role Key (из Settings -> API)
-     - `DISCORD_BOT_TOKEN` - опционально
+   - Добавьте переменные окружения в Vercel Dashboard:
+     - Перейдите в Project Settings -> Environment Variables
+     - Добавьте переменные:
+       - **`SUPABASE_URL`** - ваш Supabase URL (например: `https://xxxxx.supabase.co`)
+       - **`SUPABASE_KEY`** - **Service Role Key** (НЕ anon key!)
+         - Найти можно в Supabase Dashboard -> Settings -> API -> Service Role Key
+         - Важно: Service Role Key имеет полный доступ, включая Storage
+       - **`DISCORD_BOT_TOKEN`** - опционально (для функций Discord бота)
+     - Выберите окружения: Production, Preview, Development
+     - Сохраните и перезапустите деплой
    - Деплой запустится автоматически
 
    ### Вариант 2: Через Vercel CLI

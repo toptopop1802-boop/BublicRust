@@ -1248,8 +1248,14 @@ async function uploadMap(file) {
                 dropZone.style.pointerEvents = 'auto';
                 loadMaps();
             } else {
-                const error = JSON.parse(xhr.responseText);
-                throw new Error(error.error || 'Ошибка загрузки');
+                let errorMessage = 'Ошибка загрузки';
+                try {
+                    const error = JSON.parse(xhr.responseText);
+                    errorMessage = error.error || errorMessage;
+                } catch (e) {
+                    errorMessage = `HTTP ${xhr.status}: ${xhr.statusText}`;
+                }
+                throw new Error(errorMessage);
             }
         });
 
@@ -1270,10 +1276,31 @@ async function uploadMap(file) {
 async function loadMaps() {
     try {
         const response = await fetch(`${API_URL}/api/maps`);
+        
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({ error: 'Ошибка загрузки карт' }));
+            throw new Error(error.error || `HTTP ${response.status}`);
+        }
+
         const maps = await response.json();
 
         const container = document.getElementById('maps-list');
         if (!container) return;
+
+        // Проверяем, что maps - это массив
+        if (!Array.isArray(maps)) {
+            console.error('Expected array, got:', maps);
+            let errorMsg = 'Ошибка загрузки данных';
+            if (maps && maps.error) {
+                if (maps.error.includes('Supabase not configured')) {
+                    errorMsg = 'Supabase не настроен. Проверьте переменные окружения в Vercel.';
+                } else {
+                    errorMsg = maps.error;
+                }
+            }
+            container.innerHTML = `<p class="maps-empty" style="color: var(--danger);">⚠️ ${errorMsg}</p>`;
+            return;
+        }
 
         if (maps.length === 0) {
             container.innerHTML = '<p class="maps-empty">Загрузите первую карту для начала</p>';
@@ -1305,7 +1332,19 @@ async function loadMaps() {
         }).join('');
     } catch (error) {
         console.error('Error loading maps:', error);
-        showToast('Ошибка загрузки списка карт');
+        const container = document.getElementById('maps-list');
+        if (container) {
+            let errorMsg = 'Ошибка загрузки списка карт';
+            if (error.message) {
+                if (error.message.includes('Supabase not configured')) {
+                    errorMsg = 'Supabase не настроен. Добавьте переменные окружения SUPABASE_URL и SUPABASE_KEY в Vercel.';
+                } else {
+                    errorMsg = error.message;
+                }
+            }
+            container.innerHTML = `<p class="maps-empty" style="color: var(--danger);">⚠️ ${errorMsg}</p>`;
+        }
+        showToast(error.message || 'Ошибка загрузки списка карт');
     }
 }
 
