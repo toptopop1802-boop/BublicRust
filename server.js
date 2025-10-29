@@ -282,7 +282,7 @@ function createApp() {
     });
 
     // ============================================
-    // MAPS HOSTING API
+    // MAPS HOSTING API (без базы данных, только Storage)
     // ============================================
 
     // Upload map file
@@ -298,15 +298,21 @@ function createApp() {
 
             const mapId = uuidv4();
             const fileExt = path.extname(req.file.originalname);
+            const originalName = req.file.originalname;
             const fileName = `${mapId}${fileExt}`;
             const storagePath = `maps/${fileName}`;
 
-            // Upload to Supabase Storage
+            // Upload to Supabase Storage with metadata
             const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('maps')
                 .upload(storagePath, req.file.buffer, {
                     contentType: 'application/octet-stream',
-                    upsert: false
+                    upsert: false,
+                    metadata: {
+                        originalName: originalName,
+                        uploadedAt: new Date().toISOString(),
+                        fileSize: req.file.size.toString()
+                    }
                 });
 
             if (uploadError) {
@@ -314,24 +320,14 @@ function createApp() {
                 return res.status(500).json({ error: uploadError.message || 'Ошибка загрузки файла' });
             }
 
-            // Save metadata to database
+            // Return map data (no database needed)
             const mapData = {
                 id: mapId,
-                original_name: req.file.originalname,
+                original_name: originalName,
                 storage_path: storagePath,
                 file_size: req.file.size,
                 uploaded_at: new Date().toISOString()
             };
-
-            const { error: dbError } = await supabase
-                .from('maps')
-                .insert(mapData);
-
-            if (dbError) {
-                // Try to delete uploaded file if DB insert fails
-                await supabase.storage.from('maps').remove([storagePath]);
-                throw dbError;
-            }
 
             res.json({
                 success: true,
@@ -343,21 +339,40 @@ function createApp() {
         }
     });
 
-    // Get all maps
+    // Get all maps (from Storage, no database)
     app.get('/api/maps', async (req, res) => {
         try {
             if (!supabase) {
                 return res.status(503).json({ error: 'Supabase not configured' });
             }
 
-            const { data, error } = await supabase
+            // List all files from Storage bucket
+            const { data: files, error } = await supabase.storage
                 .from('maps')
-                .select('*')
-                .order('uploaded_at', { ascending: false });
+                .list('maps', {
+                    limit: 100,
+                    offset: 0,
+                    sortBy: { column: 'created_at', order: 'desc' }
+                });
 
             if (error) throw error;
 
-            res.json(data || []);
+            // Transform files to map format
+            const maps = (files || []).map(file => {
+                const fileExt = path.extname(file.name);
+                const mapId = path.basename(file.name, fileExt);
+                const metadata = file.metadata || {};
+                
+                return {
+                    id: mapId,
+                    original_name: metadata.originalName || file.name,
+                    storage_path: `maps/${file.name}`,
+                    file_size: parseInt(metadata.fileSize || file.metadata?.size || '0'),
+                    uploaded_at: metadata.uploadedAt || file.created_at || new Date().toISOString()
+                };
+            });
+
+            res.json(maps);
         } catch (error) {
             console.error('Error fetching maps:', error);
             res.status(500).json({ error: error.message });
@@ -371,30 +386,44 @@ function createApp() {
                 return res.status(503).json({ error: 'Supabase not configured' });
             }
 
-            const { data: map, error: fetchError } = await supabase
+            // List files to find the one with matching ID
+            const { data: files, error: listError } = await supabase.storage
                 .from('maps')
-                .select('*')
-                .eq('id', req.params.id)
-                .single();
+                .list('maps');
 
-            if (fetchError || !map) {
+            if (listError) throw listError;
+
+            // Find file by ID (ID is filename without extension)
+            const file = files?.find(f => {
+                const fileExt = path.extname(f.name);
+                const fileId = path.basename(f.name, fileExt);
+                return fileId === req.params.id;
+            });
+
+            if (!file) {
                 return res.status(404).json({ error: 'Карта не найдена' });
             }
+
+            const storagePath = `maps/${file.name}`;
 
             // Get file from Supabase Storage
             const { data: fileData, error: downloadError } = await supabase.storage
                 .from('maps')
-                .download(map.storage_path);
+                .download(storagePath);
 
             if (downloadError || !fileData) {
                 return res.status(404).json({ error: 'Файл не найден' });
             }
 
+            // Get original name from metadata
+            const metadata = file.metadata || {};
+            const originalName = metadata.originalName || file.name;
+
             // Convert blob to buffer for streaming
             const arrayBuffer = await fileData.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
 
-            res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(map.original_name)}"`);
+            res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(originalName)}"`);
             res.setHeader('Content-Type', 'application/octet-stream');
             res.setHeader('Content-Length', buffer.length);
             res.send(buffer);
@@ -411,33 +440,32 @@ function createApp() {
                 return res.status(503).json({ error: 'Supabase not configured' });
             }
 
-            // Get map info
-            const { data: map, error: fetchError } = await supabase
+            // List files to find the one with matching ID
+            const { data: files, error: listError } = await supabase.storage
                 .from('maps')
-                .select('*')
-                .eq('id', req.params.id)
-                .single();
+                .list('maps');
 
-            if (fetchError || !map) {
+            if (listError) throw listError;
+
+            // Find file by ID
+            const file = files?.find(f => {
+                const fileExt = path.extname(f.name);
+                const fileId = path.basename(f.name, fileExt);
+                return fileId === req.params.id;
+            });
+
+            if (!file) {
                 return res.status(404).json({ error: 'Карта не найдена' });
             }
+
+            const storagePath = `maps/${file.name}`;
 
             // Delete file from storage
             const { error: storageError } = await supabase.storage
                 .from('maps')
-                .remove([map.storage_path]);
+                .remove([storagePath]);
 
-            if (storageError) {
-                console.warn('Failed to delete file from storage:', storageError);
-            }
-
-            // Delete metadata from database
-            const { error: dbError } = await supabase
-                .from('maps')
-                .delete()
-                .eq('id', req.params.id);
-
-            if (dbError) throw dbError;
+            if (storageError) throw storageError;
 
             res.json({ success: true });
         } catch (error) {

@@ -167,15 +167,93 @@ nav {
 .dev-notice {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 24px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 20px;
+    padding: 32px;
     margin-bottom: 16px;
+    justify-content: center;
 }
-.dev-spinner { width: 50px; height: 50px; animation: spin 2s linear infinite; }
-.dev-notice h3 { margin: 0 0 4px 0; }
+
+.building-animation {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.building-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.build-part {
+    animation: buildAnimation 3s ease-in-out infinite;
+}
+
+.foundation {
+    animation-delay: 0s;
+    animation-fill-mode: both;
+}
+
+.walls {
+    animation-delay: 0.5s;
+    animation-fill-mode: both;
+}
+
+.window1 {
+    animation-delay: 1s;
+    animation-fill-mode: both;
+}
+
+.window2 {
+    animation-delay: 1.1s;
+    animation-fill-mode: both;
+}
+
+.door {
+    animation-delay: 1.2s;
+    animation-fill-mode: both;
+}
+
+.roof {
+    animation-delay: 1.5s;
+    animation-fill-mode: both;
+}
+
+.smoke1 {
+    animation-delay: 2s;
+    animation-fill-mode: both;
+}
+
+.smoke2 {
+    animation-delay: 2.2s;
+    animation-fill-mode: both;
+}
+
+.smoke3 {
+    animation-delay: 2.4s;
+    animation-fill-mode: both;
+}
+
+@keyframes buildAnimation {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0.3;
+        transform: translateY(0);
+    }
+}
+
+.dev-notice h3 { margin: 0 0 8px 0; }
 .dev-notice p { margin: 0; color: var(--text-secondary); }
 
 /* Pipette */
