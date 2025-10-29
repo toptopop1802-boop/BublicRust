@@ -922,6 +922,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Setup maps page
     setupMapsPage();
 
+    // Setup delete confirm modal
+    setupDeleteConfirmModal();
+
     // Sidebar expand persistence
     setupSidebarHover();
 
@@ -1500,26 +1503,70 @@ window.copyMapLink = function(mapId) {
     });
 };
 
-window.deleteMap = async function(mapId) {
-    if (!confirm('Вы уверены, что хотите удалить эту карту?')) {
-        return;
+let pendingDeleteMapId = null;
+
+window.deleteMap = function(mapId) {
+    pendingDeleteMapId = mapId;
+    const modal = document.getElementById('delete-confirm-modal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+};
+
+function setupDeleteConfirmModal() {
+    const modal = document.getElementById('delete-confirm-modal');
+    const closeBtn = document.getElementById('delete-modal-close');
+    const cancelBtn = document.getElementById('delete-cancel-btn');
+    const confirmBtn = document.getElementById('delete-confirm-btn');
+
+    function closeModal() {
+        modal.classList.remove('active');
+        pendingDeleteMapId = null;
     }
 
-    try {
-        const response = await fetch(`${API_URL}/api/maps/${mapId}`, {
-            method: 'DELETE'
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', async () => {
+            if (!pendingDeleteMapId) return;
+
+            const mapId = pendingDeleteMapId;
+            closeModal();
+
+            try {
+                const response = await fetch(`${API_URL}/api/maps/${mapId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast('Карта удалена', 'success');
+                    loadMaps();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ошибка удаления');
+                }
+            } catch (error) {
+                showToast(`Ошибка: ${error.message}`);
+            }
         });
-
-        if (response.ok) {
-            showToast('Карта удалена', 'success');
-            loadMaps();
-        } else {
-            const error = await response.json();
-            throw new Error(error.error || 'Ошибка удаления');
-        }
-    } catch (error) {
-        showToast(`Ошибка: ${error.message}`);
     }
+
+    // Close on outside click
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    }
+
+    // Close on ESC key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            closeModal();
+        }
+    });
 }
 
 function formatFileSize(bytes) {
