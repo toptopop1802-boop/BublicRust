@@ -46,6 +46,10 @@
                     <svg class="nav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.447 2.224A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span class="nav-text">Хостинг карт</span>
                 </a>
+                <a href="#" class="nav-link" data-page="changelog">
+                    <svg class="nav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="nav-text">Изменения</span>
+                </a>
             </nav>
             <div class="sidebar-footer">
                 <p class="footer-label">Последнее обновление</p>
@@ -279,6 +283,26 @@
                 </div>
             </div>
 
+            <!-- Changelog Page -->
+            <div id="page-changelog" class="page">
+                <header class="page-header">
+                    <h2>
+                        <svg class="h2-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:28px;height:28px;vertical-align:-6px;margin-right:8px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                        Изменения
+                    </h2>
+                </header>
+
+                <div class="changelog-filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Старые</label>
+                        <div class="changelog-grid" id="changelog-grid">
+                            <!-- Динамически заполняется -->
+                        </div>
+                        <label class="filter-label">Новые</label>
+                    </div>
+                </div>
+            </div>
+
             <!-- Pipette Page -->
             <div id="page-pipette" class="page">
                 <header class="page-header">
@@ -327,6 +351,50 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Changelog Detail Modal -->
+    <div id="changelog-modal" class="modal">
+        <div class="modal-content changelog-modal-content">
+            <div class="modal-header">
+                <button class="modal-close" id="changelog-modal-close">&times;</button>
+            </div>
+            <div class="changelog-detail-header">
+                <div class="changelog-date-info">
+                    <svg class="changelog-header-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke-width="2" fill="none"/>
+                        <polyline points="12 6 12 12 16 14" stroke-width="2" stroke-linecap="round" fill="none"/>
+                    </svg>
+                    <div>
+                        <div class="changelog-date" id="changelog-date">--</div>
+                        <div class="changelog-time-ago" id="changelog-time-ago">--</div>
+                    </div>
+                </div>
+                <div class="changelog-views-info">
+                    <svg class="changelog-header-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-width="2" fill="none"/>
+                        <circle cx="12" cy="12" r="3" stroke-width="2" fill="none"/>
+                    </svg>
+                    <span id="changelog-views">0 просмотров</span>
+                </div>
+            </div>
+            <div class="changelog-detail-body">
+                <div class="changelog-sections">
+                    <div class="changelog-section" id="changelog-added" style="display: none;">
+                        <h4 class="changelog-section-title">Добавлено</h4>
+                        <ul class="changelog-list" id="changelog-added-list"></ul>
+                    </div>
+                    <div class="changelog-section" id="changelog-fixed" style="display: none;">
+                        <h4 class="changelog-section-title">Исправлено</h4>
+                        <ul class="changelog-list" id="changelog-fixed-list"></ul>
+                    </div>
+                    <div class="changelog-section" id="changelog-changed" style="display: none;">
+                        <h4 class="changelog-section-title">Изменено</h4>
+                        <ul class="changelog-list" id="changelog-changed-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Confirm Delete Modal -->

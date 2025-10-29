@@ -894,6 +894,8 @@ function setupNavigation() {
                 setTimeout(resizePipetteCanvas, 0);
             } else if (page === 'maps') {
                 loadMaps();
+            } else if (page === 'changelog') {
+                loadChangelog();
             }
         });
     });
@@ -924,6 +926,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Setup delete confirm modal
     setupDeleteConfirmModal();
+
+    // Setup changelog modal
+    setupChangelogModal();
 
     // Sidebar expand persistence
     setupSidebarHover();
@@ -1575,5 +1580,191 @@ function formatFileSize(bytes) {
     const sizes = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+// ============================================
+// CHANGELOG PAGE
+// ============================================
+
+let changelogData = [];
+
+async function loadChangelog() {
+    try {
+        const response = await fetch(`${API_URL}/api/changelog`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        changelogData = data || [];
+        renderChangelogGrid();
+    } catch (error) {
+        console.error('Error loading changelog:', error);
+        // Create empty grid if API fails
+        changelogData = [];
+        renderChangelogGrid();
+    }
+}
+
+function renderChangelogGrid() {
+    const grid = document.getElementById('changelog-grid');
+    if (!grid) return;
+
+    const totalSquares = 120; // 3 rows × 40 columns
+    const squares = [];
+
+    // Fill grid with squares
+    for (let i = 0; i < totalSquares; i++) {
+        const changelog = changelogData[i];
+        const square = document.createElement('div');
+        square.className = 'changelog-square';
+        
+        if (changelog) {
+            // Determine color based on changelog type
+            let typeClass = 'empty';
+            if (changelog.added && changelog.added.length > 0) {
+                typeClass = 'added';
+            } else if (changelog.fixed && changelog.fixed.length > 0) {
+                typeClass = 'fixed';
+            } else if (changelog.changed && changelog.changed.length > 0) {
+                typeClass = 'changed';
+            }
+            
+            square.className = `changelog-square ${typeClass}`;
+            square.dataset.index = i;
+            square.addEventListener('click', () => openChangelogDetail(i));
+        } else {
+            square.className = 'changelog-square empty';
+        }
+        
+        squares.push(square);
+    }
+
+    grid.innerHTML = '';
+    squares.forEach(square => grid.appendChild(square));
+}
+
+function openChangelogDetail(index) {
+    const changelog = changelogData[index];
+    if (!changelog) return;
+
+    const modal = document.getElementById('changelog-modal');
+    const dateEl = document.getElementById('changelog-date');
+    const timeAgoEl = document.getElementById('changelog-time-ago');
+    const viewsEl = document.getElementById('changelog-views');
+    const addedSection = document.getElementById('changelog-added');
+    const fixedSection = document.getElementById('changelog-fixed');
+    const changedSection = document.getElementById('changelog-changed');
+    const addedList = document.getElementById('changelog-added-list');
+    const fixedList = document.getElementById('changelog-fixed-list');
+    const changedList = document.getElementById('changelog-changed-list');
+
+    // Format date
+    const date = new Date(changelog.date);
+    const dateStr = date.toLocaleDateString('ru-RU', { 
+        day: '2-digit', 
+        month: '2-digit', 
+        year: 'numeric'
+    });
+    const timeStr = date.toLocaleTimeString('ru-RU', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+
+    dateEl.textContent = `${dateStr} ${timeStr}`;
+
+    // Calculate time ago
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const timeAgo = diffDays > 0 ? `${diffDays} д ${diffHours} ч назад` : `${diffHours} ч назад`;
+    timeAgoEl.textContent = timeAgo;
+
+    // Views
+    viewsEl.textContent = `${changelog.views || 0} просмотров`;
+
+    // Render sections
+    if (changelog.added && changelog.added.length > 0) {
+        addedSection.style.display = 'block';
+        addedList.innerHTML = changelog.added.map(item => `
+            <li class="changelog-item">
+                <div class="changelog-item-bullet added"></div>
+                <div class="changelog-item-text">${escapeHtml(item)}</div>
+            </li>
+        `).join('');
+    } else {
+        addedSection.style.display = 'none';
+    }
+
+    if (changelog.fixed && changelog.fixed.length > 0) {
+        fixedSection.style.display = 'block';
+        fixedList.innerHTML = changelog.fixed.map(item => `
+            <li class="changelog-item">
+                <div class="changelog-item-bullet fixed"></div>
+                <div class="changelog-item-text">${escapeHtml(item)}</div>
+            </li>
+        `).join('');
+    } else {
+        fixedSection.style.display = 'none';
+    }
+
+    if (changelog.changed && changelog.changed.length > 0) {
+        changedSection.style.display = 'block';
+        changedList.innerHTML = changelog.changed.map(item => `
+            <li class="changelog-item">
+                <div class="changelog-item-bullet changed"></div>
+                <div class="changelog-item-text">${escapeHtml(item)}</div>
+            </li>
+        `).join('');
+    } else {
+        changedSection.style.display = 'none';
+    }
+
+    // Increment views
+    incrementChangelogViews(index);
+
+    modal.classList.add('active');
+}
+
+function setupChangelogModal() {
+    const modal = document.getElementById('changelog-modal');
+    const closeBtn = document.getElementById('changelog-modal-close');
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    }
+
+    // Close on ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            modal.classList.remove('active');
+        }
+    });
+}
+
+async function incrementChangelogViews(index) {
+    try {
+        await fetch(`${API_URL}/api/changelog/${index}/view`, {
+            method: 'POST'
+        });
+        // Update local data
+        if (changelogData[index]) {
+            changelogData[index].views = (changelogData[index].views || 0) + 1;
+        }
+    } catch (error) {
+        console.error('Error incrementing views:', error);
+    }
 }
 

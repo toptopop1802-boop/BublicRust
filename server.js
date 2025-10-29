@@ -474,6 +474,43 @@ function createApp() {
         }
     });
 
+    // ============================================
+    // CHANGELOG API
+    // ============================================
+
+    // In-memory changelog storage (можно заменить на базу данных)
+    let changelogStore = [];
+
+    // Get all changelog entries
+    app.get('/api/changelog', (req, res) => {
+        try {
+            // Return array with 120 entries (3 rows × 40 columns)
+            // Fill missing entries with null
+            const result = Array(120).fill(null).map((_, index) => {
+                return changelogStore[index] || null;
+            });
+            res.json(result);
+        } catch (error) {
+            console.error('Error fetching changelog:', error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    // Increment views for changelog entry
+    app.post('/api/changelog/:index/view', (req, res) => {
+        try {
+            const index = parseInt(req.params.index);
+            if (!changelogStore[index]) {
+                return res.status(404).json({ error: 'Changelog entry not found' });
+            }
+            changelogStore[index].views = (changelogStore[index].views || 0) + 1;
+            res.json({ success: true, views: changelogStore[index].views });
+        } catch (error) {
+            console.error('Error incrementing views:', error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
     // Health check
     app.get('/api/health', (req, res) => {
         res.json({

@@ -1420,3 +1420,201 @@ textarea.form-control {
     box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
 }
 
+/* Changelog Page */
+.changelog-filters {
+    margin-top: 20px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.changelog-grid {
+    display: grid;
+    grid-template-columns: repeat(40, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 4px;
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background-image: 
+        radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+    position: relative;
+}
+
+.changelog-square {
+    aspect-ratio: 1;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.changelog-square:hover {
+    transform: scale(1.1);
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.changelog-square.added {
+    background: #00d26a;
+    border-color: #00d26a;
+}
+
+.changelog-square.fixed {
+    background: #ff6b35;
+    border-color: #ff6b35;
+}
+
+.changelog-square.changed {
+    background: #3b9bf9;
+    border-color: #3b9bf9;
+}
+
+.changelog-square.empty {
+    background: var(--bg-darker);
+    border-color: var(--border-color);
+    cursor: default;
+}
+
+.changelog-square.empty:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Changelog Detail Modal */
+.changelog-modal-content {
+    max-width: 700px;
+    padding: 0;
+    background: var(--bg-card);
+    background-image: 
+        radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px),
+        radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+}
+
+.changelog-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(0,0,0,0.2);
+}
+
+.changelog-date-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.changelog-header-icon {
+    width: 20px;
+    height: 20px;
+    stroke: var(--text-secondary);
+    stroke-width: 2;
+    fill: none;
+}
+
+.changelog-date {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.changelog-time-ago {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.changelog-views-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.changelog-detail-body {
+    padding: 32px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.changelog-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.changelog-section {
+    display: block;
+}
+
+.changelog-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: var(--text-primary);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.changelog-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.changelog-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.changelog-item-bullet {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.changelog-item-bullet.added {
+    background: #00d26a;
+}
+
+.changelog-item-bullet.fixed {
+    background: #ff6b35;
+}
+
+.changelog-item-bullet.changed {
+    background: #3b9bf9;
+}
+
+.changelog-item-text {
+    flex: 1;
+}
+
