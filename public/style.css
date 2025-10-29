@@ -1349,6 +1349,18 @@ textarea.form-control {
     margin: 0 auto 20px;
     stroke: var(--danger);
     fill: none;
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
 }
 
 .confirm-message {
