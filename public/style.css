@@ -190,67 +190,298 @@ nav {
 }
 
 .build-part {
-    animation: buildAnimation 3s ease-in-out infinite;
+    animation: buildAppear 0.4s ease-out forwards;
+}
+
+.hammer {
+    animation: hammerHit 0.3s ease-in-out infinite;
+    transform-origin: 100px 45px;
+}
+
+.hammer-head {
+    animation: hammerHit 0.3s ease-in-out infinite;
+}
+
+.spark {
+    animation: sparkFlash 0.2s ease-out forwards;
+    opacity: 0;
+}
+
+.sparks {
+    opacity: 0;
+}
+
+.sparks-walls {
+    opacity: 0;
+}
+
+.sparks-roof {
+    opacity: 0;
 }
 
 .foundation {
     animation-delay: 0s;
-    animation-fill-mode: both;
+}
+
+.sparks .spark1 {
+    animation-delay: 0.1s;
+}
+
+.sparks .spark2 {
+    animation-delay: 0.15s;
+}
+
+.sparks .spark3 {
+    animation-delay: 0.2s;
+}
+
+.sparks .spark4 {
+    animation-delay: 0.25s;
+}
+
+.sparks {
+    animation: sparksShow 0.4s ease-out forwards;
+    animation-delay: 0s;
 }
 
 .walls {
-    animation-delay: 0.5s;
-    animation-fill-mode: both;
+    animation-delay: 0.8s;
+}
+
+.spark-w1 {
+    animation-delay: 0.9s;
+}
+
+.spark-w2 {
+    animation-delay: 0.95s;
+}
+
+.spark-w3 {
+    animation-delay: 1s;
+}
+
+.sparks-walls {
+    animation: sparksShow 0.4s ease-out forwards;
+    animation-delay: 0.8s;
 }
 
 .window1 {
-    animation-delay: 1s;
-    animation-fill-mode: both;
+    animation-delay: 1.5s;
 }
 
 .window2 {
-    animation-delay: 1.1s;
-    animation-fill-mode: both;
+    animation-delay: 1.6s;
 }
 
 .door {
-    animation-delay: 1.2s;
-    animation-fill-mode: both;
+    animation-delay: 1.7s;
 }
 
 .roof {
-    animation-delay: 1.5s;
-    animation-fill-mode: both;
+    animation-delay: 2s;
+}
+
+.spark-r1 {
+    animation-delay: 2.1s;
+}
+
+.spark-r2 {
+    animation-delay: 2.15s;
+}
+
+.spark-r3 {
+    animation-delay: 2.2s;
+}
+
+.sparks-roof {
+    animation: sparksShow 0.4s ease-out forwards;
+    animation-delay: 2s;
 }
 
 .smoke1 {
-    animation-delay: 2s;
-    animation-fill-mode: both;
+    animation-delay: 2.5s;
 }
 
 .smoke2 {
-    animation-delay: 2.2s;
-    animation-fill-mode: both;
+    animation-delay: 2.7s;
 }
 
 .smoke3 {
-    animation-delay: 2.4s;
-    animation-fill-mode: both;
+    animation-delay: 2.9s;
 }
 
-@keyframes buildAnimation {
+.hammer {
+    animation: hammerSequence 3.5s ease-in-out infinite;
+}
+
+@keyframes buildAppear {
     0% {
         opacity: 0;
-        transform: translateY(10px);
+        transform: scale(0.8);
     }
     50% {
         opacity: 1;
-        transform: translateY(0);
+        transform: scale(1.05);
     }
     100% {
-        opacity: 0.3;
-        transform: translateY(0);
+        opacity: 0.9;
+        transform: scale(1);
     }
+}
+
+@keyframes hammerHit {
+    0%, 100% {
+        transform: rotate(0deg) translateY(0);
+    }
+    50% {
+        transform: rotate(25deg) translateY(8px);
+    }
+}
+
+@keyframes hammerSequence {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(10px, 15px) rotate(25deg);
+    }
+    20% {
+        transform: translate(10px, 15px) rotate(25deg);
+    }
+    25% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    45% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(-10px, 15px) rotate(-25deg);
+    }
+    55% {
+        transform: translate(-10px, 15px) rotate(-25deg);
+    }
+    60% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    80% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg);
+    }
+    85% {
+        opacity: 1;
+        transform: translate(0, 10px) rotate(0deg);
+    }
+    90% {
+        transform: translate(0, 10px) rotate(0deg);
+    }
+    95% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg);
+    }
+}
+
+@keyframes sparkFlash {
+    0% {
+        opacity: 0;
+        transform: scale(0) translate(0, 0);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.5) translate(var(--spark-x, 0), var(--spark-y, -5px));
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.5) translate(var(--spark-x2, 5px), var(--spark-y2, -10px));
+    }
+}
+
+@keyframes sparksShow {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.spark1 {
+    --spark-x: -5px;
+    --spark-y: -8px;
+    --spark-x2: -8px;
+    --spark-y2: -12px;
+}
+
+.spark2 {
+    --spark-x: 5px;
+    --spark-y: -10px;
+    --spark-x2: 8px;
+    --spark-y2: -15px;
+}
+
+.spark3 {
+    --spark-x: -3px;
+    --spark-y: -6px;
+    --spark-x2: -5px;
+    --spark-y2: -10px;
+}
+
+.spark4 {
+    --spark-x: 3px;
+    --spark-y: -7px;
+    --spark-x2: 5px;
+    --spark-y2: -11px;
+}
+
+.spark-w1 {
+    --spark-x: -8px;
+    --spark-y: -5px;
+    --spark-x2: -12px;
+    --spark-y2: -8px;
+}
+
+.spark-w2 {
+    --spark-x: 0;
+    --spark-y: -8px;
+    --spark-x2: 0;
+    --spark-y2: -12px;
+}
+
+.spark-w3 {
+    --spark-x: 8px;
+    --spark-y: -5px;
+    --spark-x2: 12px;
+    --spark-y2: -8px;
+}
+
+.spark-r1 {
+    --spark-x: -6px;
+    --spark-y: -8px;
+    --spark-x2: -10px;
+    --spark-y2: -12px;
+}
+
+.spark-r2 {
+    --spark-x: 6px;
+    --spark-y: -8px;
+    --spark-x2: 10px;
+    --spark-y2: -12px;
+}
+
+.spark-r3 {
+    --spark-x: 0;
+    --spark-y: -10px;
+    --spark-x2: 0;
+    --spark-y2: -15px;
 }
 
 .dev-notice h3 { margin: 0 0 8px 0; }

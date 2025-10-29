@@ -140,21 +140,52 @@
                 <div class="dev-notice">
                     <div class="building-animation">
                         <svg class="building-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Молоток -->
+                            <g class="hammer">
+                                <rect x="90" y="40" width="20" height="4" fill="#8b7355" class="hammer-handle"/>
+                                <rect x="88" y="36" width="12" height="8" fill="#5a5a5a" class="hammer-head"/>
+                            </g>
+                            
+                            <!-- Искры -->
+                            <g class="sparks">
+                                <circle cx="60" cy="165" r="2" fill="#ffd700" class="spark spark1"/>
+                                <circle cx="75" cy="162" r="2" fill="#ff6b35" class="spark spark2"/>
+                                <circle cx="85" cy="168" r="1.5" fill="#ffd700" class="spark spark3"/>
+                                <circle cx="70" cy="170" r="1.5" fill="#ff6b35" class="spark spark4"/>
+                            </g>
+                            
                             <!-- Фундамент -->
-                            <rect x="40" y="160" width="120" height="20" fill="#3b9bf9" opacity="0.3" class="build-part foundation"/>
+                            <rect x="40" y="160" width="120" height="20" fill="#3b9bf9" opacity="0" class="build-part foundation"/>
+                            
+                            <!-- Искры для стен -->
+                            <g class="sparks-walls">
+                                <circle cx="80" cy="140" r="2" fill="#ffd700" class="spark spark-w1"/>
+                                <circle cx="95" cy="135" r="2" fill="#ff6b35" class="spark spark-w2"/>
+                                <circle cx="110" cy="142" r="1.5" fill="#ffd700" class="spark spark-w3"/>
+                            </g>
                             <!-- Стены -->
-                            <rect x="50" y="120" width="100" height="40" fill="#3b9bf9" opacity="0.3" class="build-part walls"/>
+                            <rect x="50" y="120" width="100" height="40" fill="#3b9bf9" opacity="0" class="build-part walls"/>
+                            
                             <!-- Окна -->
-                            <rect x="60" y="130" width="20" height="20" fill="#6ac1ff" opacity="0.3" class="build-part window1"/>
-                            <rect x="120" y="130" width="20" height="20" fill="#6ac1ff" opacity="0.3" class="build-part window2"/>
+                            <rect x="60" y="130" width="20" height="20" fill="#6ac1ff" opacity="0" class="build-part window1"/>
+                            <rect x="120" y="130" width="20" height="20" fill="#6ac1ff" opacity="0" class="build-part window2"/>
+                            
                             <!-- Дверь -->
-                            <rect x="85" y="140" width="30" height="20" fill="#6ac1ff" opacity="0.3" class="build-part door"/>
+                            <rect x="85" y="140" width="30" height="20" fill="#6ac1ff" opacity="0" class="build-part door"/>
+                            
+                            <!-- Искры для крыши -->
+                            <g class="sparks-roof">
+                                <circle cx="85" cy="115" r="2" fill="#ffd700" class="spark spark-r1"/>
+                                <circle cx="115" cy="118" r="2" fill="#ff6b35" class="spark spark-r2"/>
+                                <circle cx="100" cy="105" r="1.5" fill="#ffd700" class="spark spark-r3"/>
+                            </g>
                             <!-- Крыша -->
-                            <polygon points="50,120 100,80 150,120" fill="#3b9bf9" opacity="0.3" class="build-part roof"/>
+                            <polygon points="50,120 100,80 150,120" fill="#3b9bf9" opacity="0" class="build-part roof"/>
+                            
                             <!-- Дым -->
-                            <circle cx="100" cy="70" r="8" fill="#6ac1ff" opacity="0.3" class="build-part smoke1"/>
-                            <circle cx="100" cy="60" r="6" fill="#6ac1ff" opacity="0.3" class="build-part smoke2"/>
-                            <circle cx="100" cy="50" r="4" fill="#6ac1ff" opacity="0.3" class="build-part smoke3"/>
+                            <circle cx="100" cy="70" r="8" fill="#6ac1ff" opacity="0" class="build-part smoke1"/>
+                            <circle cx="100" cy="60" r="6" fill="#6ac1ff" opacity="0" class="build-part smoke2"/>
+                            <circle cx="100" cy="50" r="4" fill="#6ac1ff" opacity="0" class="build-part smoke3"/>
                         </svg>
                     </div>
                     <div>
