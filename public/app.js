@@ -199,8 +199,17 @@ function updateChart(timeline, view = 'all') {
     }
 
     function buildGradient(ctx, color) {
-        const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+        const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height || 220);
+        gradient.addColorStop(0, color.replace('1)', '0.45)'));
+        gradient.addColorStop(0.5, color.replace('1)', '0.2)'));
+        gradient.addColorStop(1, color.replace('1)', '0)'));
+        return gradient;
+    }
+
+    function buildSecondaryGradient(ctx, color) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height || 220);
         gradient.addColorStop(0, color.replace('1)', '0.35)'));
+        gradient.addColorStop(0.5, color.replace('1)', '0.15)'));
         gradient.addColorStop(1, color.replace('1)', '0)'));
         return gradient;
     }
@@ -214,13 +223,21 @@ function updateChart(timeline, view = 'all') {
             data: total,
             borderColor: getAccentRgba(1),
             backgroundColor: buildGradient(ctx, getAccentRgba(1)),
-                fill: true,
-            tension: 0.35,
-            borderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
-            pointBackgroundColor: '#1D1D1D',
-            spanGaps: true
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: getAccentRgba(1),
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 3,
+            pointHoverBackgroundColor: getAccentRgba(1),
+            spanGaps: true,
+            shadowOffsetX: 0,
+            shadowOffsetY: 4,
+            shadowBlur: 12,
+            shadowColor: getAccentRgba(0.3)
         }];
     } else if (view === 'wipes') {
         datasets = [{
@@ -229,11 +246,15 @@ function updateChart(timeline, view = 'all') {
             borderColor: getAccentRgba(1),
             backgroundColor: buildGradient(ctx, getAccentRgba(1)),
             fill: true,
-            tension: 0.35,
-            borderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
-            pointBackgroundColor: '#1D1D1D',
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: getAccentRgba(1),
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 3,
+            pointHoverBackgroundColor: getAccentRgba(1),
             spanGaps: true
         }];
     } else if (view === 'tickets') {
@@ -243,11 +264,15 @@ function updateChart(timeline, view = 'all') {
             borderColor: getAccentRgba(1),
             backgroundColor: buildGradient(ctx, getAccentRgba(1)),
             fill: true,
-            tension: 0.35,
-            borderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
-            pointBackgroundColor: '#1D1D1D',
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: getAccentRgba(1),
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 3,
+            pointHoverBackgroundColor: getAccentRgba(1),
             spanGaps: true
         }];
     } else if (view === 'roles') {
@@ -257,11 +282,15 @@ function updateChart(timeline, view = 'all') {
             borderColor: getAccentRgba(1),
             backgroundColor: buildGradient(ctx, getAccentRgba(1)),
             fill: true,
-            tension: 0.35,
-            borderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
-            pointBackgroundColor: '#1D1D1D',
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: getAccentRgba(1),
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 3,
+            pointHoverBackgroundColor: getAccentRgba(1),
             spanGaps: true
         }];
     } else if (view === 'deleted') {
@@ -271,11 +300,15 @@ function updateChart(timeline, view = 'all') {
             borderColor: getAccentRgba(1),
             backgroundColor: buildGradient(ctx, getAccentRgba(1)),
             fill: true,
-            tension: 0.35,
-            borderWidth: 2,
-            pointRadius: 3,
-            pointHoverRadius: 5,
-            pointBackgroundColor: '#1D1D1D',
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: getAccentRgba(1),
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 3,
+            pointHoverBackgroundColor: getAccentRgba(1),
             spanGaps: true
         }];
     } else if (view === 'members') {
@@ -285,11 +318,15 @@ function updateChart(timeline, view = 'all') {
             borderColor: getAccentRgba(1),
             backgroundColor: buildGradient(ctx, getAccentRgba(1)),
             fill: true,
-            tension: 0.25,
-            borderWidth: 2,
-            pointRadius: 2,
-            pointHoverRadius: 4,
-            pointBackgroundColor: '#1D1D1D',
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: getAccentRgba(1),
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 3,
+            pointHoverBackgroundColor: getAccentRgba(1),
             spanGaps: true
         }];
     }
@@ -314,7 +351,7 @@ function updateChart(timeline, view = 'all') {
                 maintainAspectRatio: true,
                 aspectRatio: 2.2,
                 animation: {
-                    duration: 750,
+                    duration: 1000,
                     easing: 'easeInOutQuart'
                 },
                 plugins: {
@@ -324,39 +361,68 @@ function updateChart(timeline, view = 'all') {
                         labels: {
                             color: '#a0a0a0',
                             usePointStyle: true,
-                            pointStyle: 'line',
-                            font: { size: 12 }
+                            pointStyle: 'circle',
+                            padding: 15,
+                            font: { 
+                                size: 13,
+                                weight: '500'
+                            }
                         }
                     },
                     tooltip: {
                         mode: 'index',
                         intersect: false,
-                        backgroundColor: '#252525',
+                        backgroundColor: 'rgba(37, 37, 37, 0.95)',
                         titleColor: '#ffffff',
                         bodyColor: '#a0a0a0',
-                        borderColor: '#3a3a3a',
-                        borderWidth: 1
+                        borderColor: getAccentRgba(0.5),
+                        borderWidth: 2,
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        cornerRadius: 8,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.parsed.y}`;
+                            }
+                        }
                     }
                 },
                 scales: {
                     x: {
                         grid: {
-                            color: '#3a3a3a',
-                            display: false
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            display: true,
+                            drawBorder: false
                         },
                         ticks: {
-                            color: '#a0a0a0'
+                            color: '#8a8a8a',
+                            font: {
+                                size: 11
+                            },
+                            padding: 10
                         }
                     },
                     y: {
                         beginAtZero: true,
                         grid: {
-                            color: '#2b2b2b'
+                            color: 'rgba(255, 255, 255, 0.05)',
+                            drawBorder: false
                         },
                         ticks: {
-                            color: '#a0a0a0',
+                            color: '#8a8a8a',
                             precision: 0,
-                            stepSize
+                            stepSize,
+                            font: {
+                                size: 11
+                            },
+                            padding: 10
                         }
                     }
                 },
@@ -364,6 +430,12 @@ function updateChart(timeline, view = 'all') {
                     mode: 'nearest',
                     axis: 'x',
                     intersect: false
+                },
+                elements: {
+                    line: {
+                        borderCapStyle: 'round',
+                        borderJoinStyle: 'round'
+                    }
                 }
             }
         });
@@ -679,8 +751,16 @@ function renderDemoChart(days, type) {
             borderColor: getAccentRgba(1),
             backgroundColor: buildGradient(ctx, getAccentRgba(1)),
             fill: true,
-            tension: 0.35,
-            borderWidth: 2
+            tension: 0.4,
+            borderWidth: 3,
+            pointRadius: 0,
+            pointHoverRadius: 6,
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: getAccentRgba(1),
+            pointBorderWidth: 2,
+            pointHoverBorderWidth: 3,
+            pointHoverBackgroundColor: getAccentRgba(1),
+            spanGaps: true
         }];
     } else {
         const map = { wipes: 'Вайпы', tickets: 'Тикеты', roles: 'Роли', deleted: 'Удаленные каналы' };
@@ -698,28 +778,68 @@ function renderDemoChart(days, type) {
     const options = {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 700, easing: 'easeInOutQuart' },
+        animation: { 
+            duration: 1000, 
+            easing: 'easeInOutQuart' 
+        },
         plugins: {
             legend: { display: false },
             tooltip: {
                 mode: 'index',
                 intersect: false,
-                backgroundColor: '#252525',
+                backgroundColor: 'rgba(37, 37, 37, 0.95)',
                 titleColor: '#ffffff',
                 bodyColor: '#a0a0a0',
-                borderColor: '#3a3a3a',
-                borderWidth: 1
+                borderColor: getAccentRgba(0.5),
+                borderWidth: 2,
+                padding: 12,
+                titleFont: {
+                    size: 14,
+                    weight: '600'
+                },
+                bodyFont: {
+                    size: 13
+                },
+                cornerRadius: 8,
+                displayColors: true
             }
         },
         scales: {
             x: {
-                grid: { display: false },
-                ticks: { color: '#a0a0a0', maxTicksLimit: days === 1 ? 8 : 10 }
+                grid: { 
+                    display: true,
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    drawBorder: false
+                },
+                ticks: { 
+                    color: '#8a8a8a', 
+                    maxTicksLimit: days === 1 ? 8 : 10,
+                    font: {
+                        size: 11
+                    },
+                    padding: 10
+                }
             },
             y: {
                 beginAtZero: true,
-                grid: { color: '#2b2b2b' },
-                ticks: { color: '#a0a0a0', precision: 0 }
+                grid: { 
+                    color: 'rgba(255, 255, 255, 0.05)',
+                    drawBorder: false
+                },
+                ticks: { 
+                    color: '#8a8a8a', 
+                    precision: 0,
+                    font: {
+                        size: 11
+                    },
+                    padding: 10
+                }
+            }
+        },
+        elements: {
+            line: {
+                borderCapStyle: 'round',
+                borderJoinStyle: 'round'
             }
         }
     };
