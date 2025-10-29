@@ -764,6 +764,8 @@ function setupNavigation() {
                 resizePipetteCanvas();
                 // layout pass first
                 setTimeout(resizePipetteCanvas, 0);
+            } else if (page === 'maps') {
+                loadMaps();
             }
         });
     });
@@ -788,6 +790,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Setup pipette
     setupPipette();
+
+    // Setup maps page
+    setupMapsPage();
 
     // Sidebar expand persistence
     setupSidebarHover();
@@ -1152,5 +1157,209 @@ function showToast(message, type) {
     el.classList.add('show');
     clearTimeout(showToast._t);
     showToast._t = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// ============================================
+// MAPS HOSTING PAGE
+// ============================================
+
+function setupMapsPage() {
+    const fileInput = document.getElementById('maps-file');
+    const dropZone = document.getElementById('maps-drop');
+    
+    if (!fileInput || !dropZone) return;
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+            if (!file.name.toLowerCase().endsWith('.map')) {
+                showToast('Пожалуйста, выберите файл с расширением .map');
+                return;
+            }
+            uploadMap(file);
+        }
+    });
+
+    // Click on drop zone
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // Drag and drop
+    ['dragenter', 'dragover'].forEach(evt => {
+        dropZone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-primary');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(evt => {
+        dropZone.addEventListener(evt, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.style.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color');
+        });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const file = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (file) {
+            if (!file.name.toLowerCase().endsWith('.map')) {
+                showToast('Пожалуйста, перетащите файл с расширением .map');
+                return;
+            }
+            uploadMap(file);
+        }
+    });
+}
+
+async function uploadMap(file) {
+    const formData = new FormData();
+    formData.append('map', file);
+
+    const progressDiv = document.getElementById('maps-upload-progress');
+    const progressFill = document.getElementById('progress-fill');
+    const progressText = document.getElementById('progress-text');
+    const dropZone = document.getElementById('maps-drop');
+
+    progressDiv.style.display = 'block';
+    dropZone.style.opacity = '0.5';
+    dropZone.style.pointerEvents = 'none';
+
+    try {
+        const xhr = new XMLHttpRequest();
+
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                progressFill.style.width = percent + '%';
+                progressText.textContent = `Загрузка: ${percent}%`;
+            }
+        });
+
+        xhr.addEventListener('load', () => {
+            if (xhr.status === 200) {
+                const response = JSON.parse(xhr.responseText);
+                showToast('Карта успешно загружена!', 'success');
+                progressDiv.style.display = 'none';
+                dropZone.style.opacity = '1';
+                dropZone.style.pointerEvents = 'auto';
+                loadMaps();
+            } else {
+                const error = JSON.parse(xhr.responseText);
+                throw new Error(error.error || 'Ошибка загрузки');
+            }
+        });
+
+        xhr.addEventListener('error', () => {
+            throw new Error('Ошибка соединения');
+        });
+
+        xhr.open('POST', `${API_URL}/api/maps/upload`);
+        xhr.send(formData);
+    } catch (error) {
+        showToast(`Ошибка: ${error.message}`);
+        progressDiv.style.display = 'none';
+        dropZone.style.opacity = '1';
+        dropZone.style.pointerEvents = 'auto';
+    }
+}
+
+async function loadMaps() {
+    try {
+        const response = await fetch(`${API_URL}/api/maps`);
+        const maps = await response.json();
+
+        const container = document.getElementById('maps-list');
+        if (!container) return;
+
+        if (maps.length === 0) {
+            container.innerHTML = '<p class="maps-empty">Загрузите первую карту для начала</p>';
+            return;
+        }
+
+        const baseUrl = window.location.origin;
+        container.innerHTML = maps.map(map => {
+            const downloadUrl = `${baseUrl}/api/maps/download/${map.id}`;
+            const uploadDate = new Date(map.uploaded_at).toLocaleString('ru-RU');
+            const fileSize = formatFileSize(map.file_size || 0);
+
+            return `
+                <div class="map-card">
+                    <div class="map-info">
+                        <h4 class="map-name">${escapeHtml(map.original_name)}</h4>
+                        <div class="map-meta">
+                            <span>📅 ${uploadDate}</span>
+                            <span>📦 ${fileSize}</span>
+                        </div>
+                    </div>
+                    <div class="map-link-section">
+                        <input type="text" class="map-link-input" value="${downloadUrl}" readonly id="map-link-${map.id}">
+                        <button class="map-link-btn" onclick="copyMapLink('${map.id}')">⧉ Копировать</button>
+                        <button class="map-delete-btn" onclick="deleteMap('${map.id}')">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading maps:', error);
+        showToast('Ошибка загрузки списка карт');
+    }
+}
+
+window.copyMapLink = function(mapId) {
+    const input = document.getElementById(`map-link-${mapId}`);
+    if (!input) return;
+
+    input.select();
+    input.setSelectionRange(0, 99999);
+
+    navigator.clipboard.writeText(input.value).then(() => {
+        const btn = input.nextElementSibling;
+        if (btn) {
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Скопировано';
+            btn.classList.add('copy-success');
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.classList.remove('copy-success');
+            }, 2000);
+        }
+        showToast('Ссылка скопирована!', 'success');
+    }).catch(() => {
+        showToast('Не удалось скопировать ссылку');
+    });
+};
+
+window.deleteMap = async function(mapId) {
+    if (!confirm('Вы уверены, что хотите удалить эту карту?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/api/maps/${mapId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            showToast('Карта удалена', 'success');
+            loadMaps();
+        } else {
+            const error = await response.json();
+            throw new Error(error.error || 'Ошибка удаления');
+        }
+    } catch (error) {
+        showToast(`Ошибка: ${error.message}`);
+    }
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 

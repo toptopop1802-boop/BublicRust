@@ -315,6 +315,15 @@ nav {
 
 .page-header h2 {
     font-size: 32px;
+    display: flex;
+    align-items: center;
+}
+
+.h2-icon {
+    width: 28px;
+    height: 28px;
+    vertical-align: -6px;
+    margin-right: 8px;
 }
 
 .header-controls {
@@ -806,5 +815,194 @@ textarea.form-control {
 
 .read-messages-btn:hover {
     background: var(--accent-primary);
+}
+
+/* Maps Hosting */
+.maps-upload-section {
+    margin-bottom: 40px;
+}
+
+.maps-upload {
+    display: block;
+}
+
+.maps-drop {
+    display: grid;
+    place-items: center;
+    gap: 16px;
+    background: var(--bg-card);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 48px 32px;
+    color: var(--text-secondary);
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+.maps-drop:hover {
+    border-color: var(--accent-primary);
+    background: rgba(59, 155, 249, 0.05);
+}
+
+.maps-upload-icon {
+    width: 64px;
+    height: 64px;
+    stroke: var(--accent-primary);
+    stroke-width: 2;
+}
+
+.maps-drop-text {
+    font-size: 16px;
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.maps-upload-progress {
+    margin-top: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-darker);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 999px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.progress-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+}
+
+.maps-list-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 28px;
+}
+
+.maps-list-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+}
+
+.maps-list {
+    display: grid;
+    gap: 16px;
+}
+
+.maps-empty {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 40px;
+    margin: 0;
+}
+
+.map-card {
+    background: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.map-card:hover {
+    border-color: var(--accent-primary);
+    transform: translateY(-2px);
+}
+
+.map-info {
+    flex: 1;
+}
+
+.map-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--text-primary);
+}
+
+.map-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.map-link-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.map-link-input {
+    min-width: 300px;
+    padding: 10px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: 'Courier New', monospace;
+}
+
+.map-link-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.map-link-btn {
+    padding: 10px 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.map-link-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary);
+}
+
+.map-link-btn.copy-success {
+    border-color: var(--success);
+    color: var(--success);
+}
+
+.map-delete-btn {
+    padding: 10px 16px;
+    background: rgba(255, 71, 87, 0.1);
+    border: 1px solid var(--danger);
+    border-radius: 8px;
+    color: var(--danger);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+}
+
+.map-delete-btn:hover {
+    background: rgba(255, 71, 87, 0.2);
 }
 

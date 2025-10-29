@@ -11,5 +11,7 @@ yarn-error.log*
 build/
 dist/
 coverage/
+# Uploads
+uploads/
 # Misc
 .DS_Store

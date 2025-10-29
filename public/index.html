@@ -42,6 +42,10 @@
                     <svg class="nav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 7l3-3 3 3-3 3M4 17l6-6m0 0l4-4 3 3-4 4m-3-3l-6 6v3h3l6-6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     <span class="nav-text">Пипетка</span>
                 </a>
+                <a href="#" class="nav-link" data-page="maps">
+                    <svg class="nav-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.447 2.224A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span class="nav-text">Хостинг карт</span>
+                </a>
             </nav>
             <div class="sidebar-footer">
                 <p class="footer-label">Последнее обновление</p>
@@ -190,6 +194,42 @@
 
                 <div id="channels-list" class="channels-list">
                     <!-- Динамически заполняется -->
+                </div>
+            </div>
+
+            <!-- Maps Hosting Page -->
+            <div id="page-maps" class="page">
+                <header class="page-header">
+                    <h2>
+                        <svg class="h2-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:28px;height:28px;vertical-align:-6px;margin-right:8px;"><path d="M9 20l-5.447-2.724A1 1 0 0 1 3 16.382V5.618a1 1 0 0 1 1.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.447 2.224A1 1 0 0 0 21 18.382V7.618a1 1 0 0 0-.553-.894L15 4m0 13V4m0 0L9 7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+                        Хостинг карт
+                    </h2>
+                </header>
+
+                <div class="maps-upload-section">
+                    <label class="maps-upload" for="maps-file">
+                        <input id="maps-file" type="file" accept=".map" hidden>
+                        <div class="maps-drop" id="maps-drop">
+                            <svg class="maps-upload-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            </svg>
+                            <p class="maps-drop-text">Перетащите файл .map сюда или нажмите для выбора</p>
+                            <button class="btn btn-primary" type="button">ВЫБРАТЬ ФАЙЛ</button>
+                        </div>
+                    </label>
+                    <div id="maps-upload-progress" class="maps-upload-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <p class="progress-text" id="progress-text">Загрузка...</p>
+                    </div>
+                </div>
+
+                <div class="maps-list-section">
+                    <h3>Загруженные карты</h3>
+                    <div id="maps-list" class="maps-list">
+                        <p class="maps-empty">Загрузите первую карту для начала</p>
+                    </div>
                 </div>
             </div>
 

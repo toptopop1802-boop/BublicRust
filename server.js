@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const { createClient } = require('@supabase/supabase-js');
 const { Client, GatewayIntentBits } = require('discord.js');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
@@ -9,6 +12,21 @@ const IS_SERVERLESS = !!process.env.VERCEL;
 
 function createApp() {
     const app = express();
+
+    // Configure multer for file uploads (memory storage for serverless)
+    const upload = multer({
+        storage: multer.memoryStorage(),
+        limits: {
+            fileSize: 100 * 1024 * 1024 // 100MB limit
+        },
+        fileFilter: (req, file, cb) => {
+            if (path.extname(file.originalname).toLowerCase() === '.map') {
+                cb(null, true);
+            } else {
+                cb(new Error('Только файлы .map разрешены'));
+            }
+        }
+    });
 
     // Middleware
     app.use(cors());
@@ -259,6 +277,171 @@ function createApp() {
             });
         } catch (error) {
             console.error('Error sending message:', error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    // ============================================
+    // MAPS HOSTING API
+    // ============================================
+
+    // Upload map file
+    app.post('/api/maps/upload', upload.single('map'), async (req, res) => {
+        try {
+            if (!req.file) {
+                return res.status(400).json({ error: 'Файл не загружен' });
+            }
+
+            if (!supabase) {
+                return res.status(503).json({ error: 'Supabase not configured' });
+            }
+
+            const mapId = uuidv4();
+            const fileExt = path.extname(req.file.originalname);
+            const fileName = `${mapId}${fileExt}`;
+            const storagePath = `maps/${fileName}`;
+
+            // Upload to Supabase Storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('maps')
+                .upload(storagePath, req.file.buffer, {
+                    contentType: 'application/octet-stream',
+                    upsert: false
+                });
+
+            if (uploadError) {
+                console.error('Supabase upload error:', uploadError);
+                return res.status(500).json({ error: uploadError.message || 'Ошибка загрузки файла' });
+            }
+
+            // Save metadata to database
+            const mapData = {
+                id: mapId,
+                original_name: req.file.originalname,
+                storage_path: storagePath,
+                file_size: req.file.size,
+                uploaded_at: new Date().toISOString()
+            };
+
+            const { error: dbError } = await supabase
+                .from('maps')
+                .insert(mapData);
+
+            if (dbError) {
+                // Try to delete uploaded file if DB insert fails
+                await supabase.storage.from('maps').remove([storagePath]);
+                throw dbError;
+            }
+
+            res.json({
+                success: true,
+                map: mapData
+            });
+        } catch (error) {
+            console.error('Error uploading map:', error);
+            res.status(500).json({ error: error.message || 'Ошибка загрузки файла' });
+        }
+    });
+
+    // Get all maps
+    app.get('/api/maps', async (req, res) => {
+        try {
+            if (!supabase) {
+                return res.status(503).json({ error: 'Supabase not configured' });
+            }
+
+            const { data, error } = await supabase
+                .from('maps')
+                .select('*')
+                .order('uploaded_at', { ascending: false });
+
+            if (error) throw error;
+
+            res.json(data || []);
+        } catch (error) {
+            console.error('Error fetching maps:', error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    // Download map file
+    app.get('/api/maps/download/:id', async (req, res) => {
+        try {
+            if (!supabase) {
+                return res.status(503).json({ error: 'Supabase not configured' });
+            }
+
+            const { data: map, error: fetchError } = await supabase
+                .from('maps')
+                .select('*')
+                .eq('id', req.params.id)
+                .single();
+
+            if (fetchError || !map) {
+                return res.status(404).json({ error: 'Карта не найдена' });
+            }
+
+            // Get file from Supabase Storage
+            const { data: fileData, error: downloadError } = await supabase.storage
+                .from('maps')
+                .download(map.storage_path);
+
+            if (downloadError || !fileData) {
+                return res.status(404).json({ error: 'Файл не найден' });
+            }
+
+            // Convert blob to buffer for streaming
+            const arrayBuffer = await fileData.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(map.original_name)}"`);
+            res.setHeader('Content-Type', 'application/octet-stream');
+            res.setHeader('Content-Length', buffer.length);
+            res.send(buffer);
+        } catch (error) {
+            console.error('Error downloading map:', error);
+            res.status(500).json({ error: error.message });
+        }
+    });
+
+    // Delete map
+    app.delete('/api/maps/:id', async (req, res) => {
+        try {
+            if (!supabase) {
+                return res.status(503).json({ error: 'Supabase not configured' });
+            }
+
+            // Get map info
+            const { data: map, error: fetchError } = await supabase
+                .from('maps')
+                .select('*')
+                .eq('id', req.params.id)
+                .single();
+
+            if (fetchError || !map) {
+                return res.status(404).json({ error: 'Карта не найдена' });
+            }
+
+            // Delete file from storage
+            const { error: storageError } = await supabase.storage
+                .from('maps')
+                .remove([map.storage_path]);
+
+            if (storageError) {
+                console.warn('Failed to delete file from storage:', storageError);
+            }
+
+            // Delete metadata from database
+            const { error: dbError } = await supabase
+                .from('maps')
+                .delete()
+                .eq('id', req.params.id);
+
+            if (dbError) throw dbError;
+
+            res.json({ success: true });
+        } catch (error) {
+            console.error('Error deleting map:', error);
             res.status(500).json({ error: error.message });
         }
     });
